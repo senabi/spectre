@@ -43,22 +43,33 @@ public:
   // Alias para los tipos de los elementos del array.
   using ValueType = int;
 
-  // This could likewise be a parameter and, likewise, isn't. Making the array
-  // smaller doesn't improve the bandwidth of the side-channel, and trying to
-  // leak more than a byte at a time significantly increases noise due to
-  // greater cache contention.
+  // Hacer el array mas pequeño, no hace que mejore el bandwidth del
+  // side-channel. Y tratar de filtrar mas de un byte a la vez incrementa
+  // significativamente el ruido debido a un mayor cache contention.
   //
-  // "Real" elements because we add buffer elements before and after. See
-  // comment on `elements_` below.
+  // "Real" elementos porque se aumentan elementos buffer antes y despues.
+  // Mirar comentario en `elements_` abajo.
   //
-  // definitions:
-  // Cache contention occurs when two or more CPUs alternately and repeatedly
-  // update the same cache line.
+  // Cache contention ocurre cuando 2 o mas CPUs alternadamente y repetidamente
+  // actualizan la misma cache line.
   static const size_t kRealElements = 256;
 
   TimingArray() {
-    // Explicitly initialize the elements of the array.
+    // Explicitamente inicializar los elementos del array
     //
+    // No es importante que valor se escribe mientras se fuerze que *algo* sea
+    // escrito a cada elemento. De otra forma,
+    //
+    // No es importante el valor que escribamos siempre que forcemos escribir
+    // algo en cada elemento. De lo contrario, la asignación de respaldo podría
+    // ser un rango de páginas de zero-fill-on-demand(ZFOD), de copy-on-writre
+    // que todas comienzan mapeadas a la misma página física de ceros. Dado que
+    // la caché en las CPUs modernas de Intel está etiquetada físicamente,
+    // algunos elementos podrían asignarse a la misma línea de caché y no
+    // observaríamos una diferencia de tiempo entre la lectura de elementos
+    // accedidos y no accedidos.
+    //
+    // [EN]:
     // It's not important what value we write as long as we force *something* to
     // be written to each element. Otherwise, the backing allocation could be a
     // range of zero-fill-on-demand (ZFOD), copy-on-write pages that all start
