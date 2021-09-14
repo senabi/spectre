@@ -9,6 +9,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 enable_language(ASM)
 
 add_executable(spectre_v1_pht
-    spectre_safeside.cc
-    MeasureReadLatency_x86_64.S
+    spectre.cc
+    read_latency.S
 )
