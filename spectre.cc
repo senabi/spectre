@@ -68,7 +68,7 @@ public:
   using ValueType = int;
 
   TimingArray() {
-    // avoid zog
+    // force copy on write
     for (int i = 0; i < size(); ++i) {
       ElementAt(i) = -1;
     }
